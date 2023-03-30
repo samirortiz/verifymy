@@ -14,7 +14,7 @@ func AllUsers(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println("Method not allowed")
 		return
 	}
-	users, err := allUsers()
+	users, err := allUsers(r.Context())
 	if len(users) == 0 {
 		fmt.Fprintf(rw, "Error on GetUsers(): %v", "No users found\n")
 		return
@@ -33,7 +33,7 @@ func UserById(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println("Method not allowed")
 		return
 	}
-	user, err := userByID(r.URL.Query().Get("id"))
+	user, err := userByID(r.URL.Query().Get("id"), r.Context())
 	if user == (User{}) {
 		fmt.Fprintf(rw, "Error on UserById(): %v", "No user with specified id\n")
 		return
@@ -56,7 +56,7 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(rw, "Error on ParseForm(): %v", err)
 		return
 	}
-	user, err := createUser(r.Form)
+	user, err := createUser(r.Form, r.Context())
 	if err != nil {
 		fmt.Fprintf(rw, "Error on CreateUser(): %v", err)
 		return
@@ -76,7 +76,7 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var userId string = r.URL.Query().Get("id")
-	user, err := updateUser(userId, r.Form)
+	user, err := updateUser(userId, r.Form, r.Context())
 	if err != nil {
 		http.Error(rw, "No user to update", http.StatusNoContent)
 		fmt.Fprintf(rw, "Error in UpdateUser(): %v", err)
@@ -97,7 +97,7 @@ func DeleteUser(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(rw, "Error in DeleteUser(): %v", err)
 		return
 	}
-	affected, err := deleteUser(userId)
+	affected, err := deleteUser(userId, r.Context())
 	if err != nil {
 		fmt.Fprintf(rw, "Error in DeleteUser(): %v", err)
 		return

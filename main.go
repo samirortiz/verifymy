@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -16,13 +17,24 @@ import (
 
 var db *sql.DB
 
+type Env struct {
+	db *sql.DB
+}
+
 // LOAD ENVIRONMENT FILE AND SET CONNECTION TO USERS PACKAGE
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	u.SetDB(connectDB())
+	connectDB()
+}
+
+func injectDB(db *sql.DB, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "db", db)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
 }
 
 // MAIN FUNCION
@@ -32,11 +44,11 @@ func main() {
 
 // HANDLE REQUESTS
 func handleRequests() {
-	http.HandleFunc("/users", u.AllUsers)
-	http.HandleFunc("/users/create", u.CreateUser)
-	http.HandleFunc("/users/update", u.UpdateUser)
-	http.HandleFunc("/users/byid", u.UserById)
-	http.HandleFunc("/users/delete", u.DeleteUser)
+	http.Handle("/users", injectDB(db, u.AllUsers))
+	http.Handle("/users/create", injectDB(db, u.CreateUser))
+	http.Handle("/users/update", injectDB(db, u.UpdateUser))
+	http.Handle("/users/byid", injectDB(db, u.UserById))
+	http.Handle("/users/delete", injectDB(db, u.DeleteUser))
 
 	err := http.ListenAndServe(":9090", nil)
 
@@ -49,13 +61,13 @@ func handleRequests() {
 }
 
 // CONNECT DATABASE
-func connectDB() *sql.DB {
+func connectDB() {
 	cfg := mysql.Config{
 		User:                 os.Getenv("DB_USERNAME"),
 		Passwd:               os.Getenv("DB_PASSWORD"),
 		Net:                  "tcp",
 		Addr:                 os.Getenv("DB_HOST"),
-		DBName:               os.Getenv("DB_NAME"),
+		DBName:               os.Getenv("DB_DATABASE"),
 		AllowNativePasswords: true,
 	}
 
@@ -68,5 +80,4 @@ func connectDB() *sql.DB {
 	if pingErr != nil {
 		log.Fatal(pingErr)
 	}
-	return db
 }

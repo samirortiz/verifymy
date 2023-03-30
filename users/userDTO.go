@@ -1,19 +1,19 @@
 package users
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"net/url"
 )
 
-var db *sql.DB
-
-// SET DATABASE CONNECTION
-func SetDB(database *sql.DB) {
-	db = database
-}
-
 // RETURN ALL USERS
-func allUsers() ([]User, error) {
+func allUsers(ctx context.Context) ([]User, error) {
+	db, ok := ctx.Value("db").(*sql.DB)
+	if !ok {
+		return nil, errors.New("could not get database connection pool from context")
+	}
+
 	var users []User
 	rows, err := db.Query("SELECT * FROM users")
 	if err != nil {
@@ -34,8 +34,12 @@ func allUsers() ([]User, error) {
 }
 
 // RETURN SINGLE USER BY ID
-func userByID(id string) (User, error) {
+func userByID(id string, ctx context.Context) (User, error) {
 	var user User
+	db, ok := ctx.Value("db").(*sql.DB)
+	if !ok {
+		return user, errors.New("could not get database connection pool from context")
+	}
 	row := db.QueryRow("SELECT * FROM users WHERE id = ?", id)
 	if err := row.Scan(&user.Id, &user.Name, &user.Age, &user.Address, &user.Email, &user.Password); err != nil {
 		if err == sql.ErrNoRows {
@@ -47,8 +51,12 @@ func userByID(id string) (User, error) {
 }
 
 // CREATE USER
-func createUser(formData url.Values) (User, error) {
+func createUser(formData url.Values, ctx context.Context) (User, error) {
 	var user User
+	db, ok := ctx.Value("db").(*sql.DB)
+	if !ok {
+		return user, errors.New("could not get database connection pool from context")
+	}
 	stmt, _ := db.Prepare("INSERT INTO users(name, age, address, email, password) VALUES (?, ?, ?, ?, ?)")
 	res, err := stmt.Exec(formData.Get("name"), formData.Get("age"), formData.Get("address"), formData.Get("email"), formData.Get("password"))
 	if err != nil {
@@ -69,8 +77,12 @@ func createUser(formData url.Values) (User, error) {
 }
 
 // UPDATE USER BY ID
-func updateUser(userId string, formData url.Values) (User, error) {
+func updateUser(userId string, formData url.Values, ctx context.Context) (User, error) {
 	var user User
+	db, ok := ctx.Value("db").(*sql.DB)
+	if !ok {
+		return user, errors.New("could not get database connection pool from context")
+	}
 	stmt, _ := db.Prepare("UPDATE users set name = ?, age = ?, address = ?, email = ?, password = ? WHERE id = ?")
 	res, err := stmt.Exec(formData.Get("name"), formData.Get("age"), formData.Get("address"), formData.Get("email"), formData.Get("password"), userId)
 	if err != nil {
@@ -94,7 +106,11 @@ func updateUser(userId string, formData url.Values) (User, error) {
 }
 
 // DELETE USER BY ID
-func deleteUser(id int) (int, error) {
+func deleteUser(id int, ctx context.Context) (int, error) {
+	db, ok := ctx.Value("db").(*sql.DB)
+	if !ok {
+		return 0, errors.New("could not get database connection pool from context")
+	}
 	res, err := db.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {
 		return 0, err
