@@ -55,7 +55,7 @@ func connectDB() *sql.DB {
 		Passwd:               os.Getenv("DB_PASSWORD"),
 		Net:                  "tcp",
 		Addr:                 os.Getenv("DB_HOST"),
-		DBName:               os.Getenv("DB_NAME"),
+		DBName:               os.Getenv("DB_DATABASE"),
 		AllowNativePasswords: true,
 	}
 
