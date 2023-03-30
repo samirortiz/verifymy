@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// RETURN ALL USERS
 func AllUsers(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
@@ -25,6 +26,7 @@ func AllUsers(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(users)
 }
 
+// RETURN SINGLE USER BY ID
 func UserById(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
@@ -43,6 +45,7 @@ func UserById(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(user)
 }
 
+// CREATE USER WITH POST REQUEST
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
@@ -61,6 +64,7 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(rw, "The last inserted user: %v\n", &user)
 }
 
+// UPDATE USER BY ID WITH PUT REQUEST
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != "PUT" {
 		fmt.Println("Method not allowed")
@@ -81,6 +85,7 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(rw, "Updated user id: %v\n", &user)
 }
 
+// DELETE USER BY ID WITH DELETE REQUEST
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
 	if r.Method != "DELETE" {
 		fmt.Println("Method not allowed")

@@ -7,6 +7,12 @@ import (
 
 var db *sql.DB
 
+// SET DATABASE CONNECTION
+func SetDB(database *sql.DB) {
+	db = database
+}
+
+// RETURN ALL USERS
 func allUsers() ([]User, error) {
 	var users []User
 	rows, err := db.Query("SELECT * FROM users")
@@ -27,6 +33,7 @@ func allUsers() ([]User, error) {
 	return users, nil
 }
 
+// RETURN SINGLE USER BY ID
 func userByID(id string) (User, error) {
 	var user User
 	row := db.QueryRow("SELECT * FROM users WHERE id = ?", id)
@@ -39,6 +46,7 @@ func userByID(id string) (User, error) {
 	return user, nil
 }
 
+// CREATE USER
 func createUser(formData url.Values) (User, error) {
 	var user User
 	stmt, _ := db.Prepare("INSERT INTO users(name, age, address, email, password) VALUES (?, ?, ?, ?, ?)")
@@ -60,6 +68,7 @@ func createUser(formData url.Values) (User, error) {
 	return user, nil
 }
 
+// UPDATE USER BY ID
 func updateUser(userId string, formData url.Values) (User, error) {
 	var user User
 	stmt, _ := db.Prepare("UPDATE users set name = ?, age = ?, address = ?, email = ?, password = ? WHERE id = ?")
@@ -84,6 +93,7 @@ func updateUser(userId string, formData url.Values) (User, error) {
 	return user, nil
 }
 
+// DELETE USER BY ID
 func deleteUser(id int) (int, error) {
 	res, err := db.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {

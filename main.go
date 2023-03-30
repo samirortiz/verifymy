@@ -16,18 +16,21 @@ import (
 
 var db *sql.DB
 
+// LOAD ENVIRONMENT FILE AND SET CONNECTION TO USERS PACKAGE
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	u.SetDB(connectDB())
 }
 
+// MAIN FUNCION
 func main() {
-	connectDB()
 	handleRequests()
 }
 
+// HANDLE REQUESTS
 func handleRequests() {
 	http.HandleFunc("/users", u.AllUsers)
 	http.HandleFunc("/users/create", u.CreateUser)
@@ -45,8 +48,8 @@ func handleRequests() {
 	}
 }
 
-func connectDB() {
-	// Capture connection properties.
+// CONNECT DATABASE
+func connectDB() *sql.DB {
 	cfg := mysql.Config{
 		User:                 os.Getenv("DB_USERNAME"),
 		Passwd:               os.Getenv("DB_PASSWORD"),
@@ -55,7 +58,7 @@ func connectDB() {
 		DBName:               os.Getenv("DB_NAME"),
 		AllowNativePasswords: true,
 	}
-	// Get a database handle.
+
 	var err error
 	db, err = sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -65,4 +68,5 @@ func connectDB() {
 	if pingErr != nil {
 		log.Fatal(pingErr)
 	}
+	return db
 }

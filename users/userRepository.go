@@ -1,5 +1,6 @@
 package users
 
+// USER STRUCTURE
 type User struct {
 	Id       int64  `json:"ID"`
 	Name     string `json:"Name"`
