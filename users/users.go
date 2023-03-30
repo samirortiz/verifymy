@@ -1,9 +1,11 @@
-package main
+package users
 
 import (
 	"database/sql"
 	"net/url"
 )
+
+var db *sql.DB
 
 func allUsers() ([]User, error) {
 	var users []User

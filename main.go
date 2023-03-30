@@ -10,6 +10,8 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+
+	u "workspace/users"
 )
 
 var db *sql.DB
@@ -27,11 +29,11 @@ func main() {
 }
 
 func handleRequests() {
-	http.HandleFunc("/users", AllUsers)
-	http.HandleFunc("/users/create", CreateUser)
-	http.HandleFunc("/users/update", UpdateUser)
-	http.HandleFunc("/users/byid", UserById)
-	http.HandleFunc("/users/delete", DeleteUser)
+	http.HandleFunc("/users", u.AllUsers)
+	http.HandleFunc("/users/create", u.CreateUser)
+	http.HandleFunc("/users/update", u.UpdateUser)
+	http.HandleFunc("/users/byid", u.UserById)
+	http.HandleFunc("/users/delete", u.DeleteUser)
 
 	err := http.ListenAndServe(":9090", nil)
 
