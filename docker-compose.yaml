@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  go:
+    restart: unless-stopped
+    container_name: verify-samir
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 9090:9090
+    volumes:
+      - .:/root
+    links: 
+      - mysql
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    container_name: verify-db
+    build: 
+      context: .
+      args:
+        - UID=${UID}
+      dockerfile: ./devops/local/mysql/Dockerfile
+    environment:
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 33060:3306
+    volumes:
+      - ./devops/local/db-data:/var/lib/mysql
+      - ./devops/local/init/dump:/docker-entrypoint-initdb.d
+    user: mysql
