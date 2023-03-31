@@ -2,7 +2,6 @@ package users
 
 import (
 	"database/sql"
-	"net/url"
 )
 
 var db *sql.DB
@@ -47,10 +46,9 @@ func userByID(id string) (User, error) {
 }
 
 // CREATE USER
-func createUser(formData url.Values) (User, error) {
-	var user User
+func createUser(user User) (User, error) {
 	stmt, _ := db.Prepare("INSERT INTO users(name, age, address, email, password) VALUES (?, ?, ?, ?, ?)")
-	res, err := stmt.Exec(formData.Get("name"), formData.Get("age"), formData.Get("address"), formData.Get("email"), formData.Get("password"))
+	res, err := stmt.Exec(user.Name, user.Age, user.Address, user.Email, user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -69,10 +67,9 @@ func createUser(formData url.Values) (User, error) {
 }
 
 // UPDATE USER BY ID
-func updateUser(userId string, formData url.Values) (User, error) {
-	var user User
+func updateUser(userId string, user User) (User, error) {
 	stmt, _ := db.Prepare("UPDATE users set name = ?, age = ?, address = ?, email = ?, password = ? WHERE id = ?")
-	res, err := stmt.Exec(formData.Get("name"), formData.Get("age"), formData.Get("address"), formData.Get("email"), formData.Get("password"), userId)
+	res, err := stmt.Exec(user.Name, user.Age, user.Address, user.Email, user.Password, userId)
 	if err != nil {
 		return user, err
 	}

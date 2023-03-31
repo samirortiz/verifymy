@@ -3,6 +3,7 @@ package users
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -47,16 +48,25 @@ func UserById(rw http.ResponseWriter, r *http.Request) {
 
 // CREATE USER WITH POST REQUEST
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
+	var usr User
 	if r.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 		fmt.Println("Method not allowed")
 		return
 	}
-	if err := r.ParseForm(); err != nil {
-		fmt.Fprintf(rw, "Error on ParseForm(): %v", err)
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(rw, err.Error(), 500)
 		return
 	}
-	user, err := createUser(r.Form)
+	err = json.Unmarshal(body, &usr)
+	if err != nil {
+		http.Error(rw, err.Error(), 500)
+		return
+	}
+
+	user, err := createUser(usr)
 	if err != nil {
 		fmt.Fprintf(rw, "Error on CreateUser(): %v", err)
 		return
@@ -66,17 +76,25 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 // UPDATE USER BY ID WITH PUT REQUEST
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
+	var usr User
 	if r.Method != "PUT" {
 		fmt.Println("Method not allowed")
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := r.ParseForm(); err != nil {
-		fmt.Fprintf(rw, "Error in UpdateUser(),ParseForm(): %v", err)
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(rw, err.Error(), 500)
+		return
+	}
+	err = json.Unmarshal(body, &usr)
+	if err != nil {
+		http.Error(rw, err.Error(), 500)
 		return
 	}
 	var userId string = r.URL.Query().Get("id")
-	user, err := updateUser(userId, r.Form)
+	user, err := updateUser(userId, usr)
 	if err != nil {
 		http.Error(rw, "No user to update", http.StatusNoContent)
 		fmt.Fprintf(rw, "Error in UpdateUser(): %v", err)

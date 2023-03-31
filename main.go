@@ -35,7 +35,7 @@ func handleRequests() {
 	http.HandleFunc("/users", u.AllUsers)
 	http.HandleFunc("/users/create", u.CreateUser)
 	http.HandleFunc("/users/update", u.UpdateUser)
-	http.HandleFunc("/users/byid", u.UserById)
+	http.HandleFunc("/users/getbyid", u.UserById)
 	http.HandleFunc("/users/delete", u.DeleteUser)
 
 	err := http.ListenAndServe(":9090", nil)
