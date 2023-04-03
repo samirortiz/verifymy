@@ -11,6 +11,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 
+	a "workspace/auth"
 	u "workspace/users"
 )
 
@@ -37,6 +38,9 @@ func handleRequests() {
 	http.HandleFunc("/users/update", u.UpdateUser)
 	http.HandleFunc("/users/getbyid", u.UserById)
 	http.HandleFunc("/users/delete", u.DeleteUser)
+	http.HandleFunc("/signin", a.Signin)
+	http.HandleFunc("/refresh", a.Refresh)
+	http.HandleFunc("/logout", a.Logout)
 
 	err := http.ListenAndServe(":9090", nil)
 
