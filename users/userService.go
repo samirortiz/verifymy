@@ -6,15 +6,23 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	a "workspace/auth"
 )
 
 // RETURN ALL USERS
 func AllUsers(rw http.ResponseWriter, r *http.Request) {
+	ok, erro := a.CheckToken(rw, r)
+	if ok == 0 {
+		fmt.Fprintf(rw, "Invalid token: %v", erro)
+		return
+	}
 	if r.Method != "GET" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 		fmt.Println("Method not allowed")
 		return
 	}
+
 	users, err := allUsers()
 	if len(users) == 0 {
 		fmt.Fprintf(rw, "Error on GetUsers(): %v", "No users found\n")
@@ -29,11 +37,17 @@ func AllUsers(rw http.ResponseWriter, r *http.Request) {
 
 // RETURN SINGLE USER BY ID
 func UserById(rw http.ResponseWriter, r *http.Request) {
+	ok, erro := a.CheckToken(rw, r)
+	if ok == 0 {
+		fmt.Fprintf(rw, "Invalid token: %v", erro)
+		return
+	}
 	if r.Method != "GET" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
 		fmt.Println("Method not allowed")
 		return
 	}
+
 	user, err := userByID(r.URL.Query().Get("id"))
 	if user == (User{}) {
 		fmt.Fprintf(rw, "Error on UserById(): %v", "No user with specified id\n")
@@ -48,6 +62,11 @@ func UserById(rw http.ResponseWriter, r *http.Request) {
 
 // CREATE USER WITH POST REQUEST
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
+	ok, erro := a.CheckToken(rw, r)
+	if ok == 0 {
+		fmt.Fprintf(rw, "Invalid token: %v", erro)
+		return
+	}
 	var usr User
 	if r.Method != "POST" {
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
@@ -76,6 +95,11 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 // UPDATE USER BY ID WITH PUT REQUEST
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
+	ok, erro := a.CheckToken(rw, r)
+	if ok == 0 {
+		fmt.Fprintf(rw, "Invalid token: %v", erro)
+		return
+	}
 	var usr User
 	if r.Method != "PUT" {
 		fmt.Println("Method not allowed")
@@ -105,6 +129,11 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 // DELETE USER BY ID WITH DELETE REQUEST
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
+	ok, erro := a.CheckToken(rw, r)
+	if ok == 0 {
+		fmt.Fprintf(rw, "Invalid token: %v", erro)
+		return
+	}
 	if r.Method != "DELETE" {
 		fmt.Println("Method not allowed")
 		http.Error(rw, "Method not allowed", http.StatusMethodNotAllowed)
