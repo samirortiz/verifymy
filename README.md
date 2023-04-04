@@ -10,7 +10,7 @@ Routes and curls:
 
 Signin
 I used jwt with cookie auth
-curl http://localhost:9090/signin -d '{"usernamne" : "admin", "password" : "123456"}' -c cookie.txt -X POST
+curl http://localhost:9090/signin -d '{"username" : "admin", "password" : "123456"}' -c cookie.txt -X POST
 
 Logout
 curl http://localhost:9090/logout -c cookie.txt
