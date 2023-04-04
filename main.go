@@ -64,7 +64,7 @@ func connectDB() *sql.DB {
 	}
 
 	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err = sql.Open(os.Getenv("DB_DRIVER"), cfg.FormatDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
