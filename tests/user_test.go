@@ -48,12 +48,12 @@ func TestCreateUserRecord(t *testing.T) {
 }
 
 func TestCheckPassword(t *testing.T) {
-	hash := os.Getenv("passwordHash")
+	hash := "$2y$10$viTMrllQZStSgNcznSS.6uxUNUZZGKbQlRf0C4OTeGajz8ONUnqIW"
 
 	user := User{
 		Password: hash,
 	}
 
-	err := user.CheckPassword("secret")
+	err := user.CheckPassword("samiroquai")
 	assert.NoError(t, err)
 }
